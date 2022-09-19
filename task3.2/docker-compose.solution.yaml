@@ -1,0 +1,26 @@
+version: '3.6'
+
+services:
+  # This time, our webserver is a Flask application written in Python
+  web:
+    # Lets build our custom Docker image!
+    build:
+      context: './.docker/flask'
+      dockerfile: Dockerfile # Optional when file is called "Dockerfile"
+    # Bind mount our source directory
+    volumes:
+      - ./src:/code
+    # And ports... again!
+    ports:
+      - 8000:5000
+    networks:
+      - view_counter_network
+  # Redis - high performance key-value store
+  # Default configuration is port 6379
+  redis:
+    image: redis:alpine
+    networks:
+      - view_counter_network
+
+networks:
+  view_counter_network:
