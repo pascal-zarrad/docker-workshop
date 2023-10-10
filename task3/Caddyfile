@@ -1,0 +1,10 @@
+localhost
+root * /var/www/html
+
+log
+encode gzip
+file_server
+
+php_fastcgi fpm:9000 {
+	try_files {path} {path}/index.php {path}/index.html =404
+}

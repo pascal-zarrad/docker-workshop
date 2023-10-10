@@ -1,0 +1,88 @@
+# Version of the specifiction for this docker-compose file
+# Most of the time, almost anything above 3 will be fine.
+# In future versions, this line won't be necessary at all.
+version: '3.8'
+
+# Every service is a container that should be started.
+# You can imagine any of the services to be an own "docker run" command.
+# This also means that every option corresponds to some argument (e. g. "-v" for volume).
+#
+# Compose let's you configure many containers with ease and let's you keep track
+# of all the services.
+services:
+  webserver:
+    image: docker.io/library/caddy:2.7.4-alpine
+    working_dir: /var/www/html
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - evento-caddy:/data/caddy
+      - ./:/var/www/html:rw
+    networks:
+      - evento-network
+    
+  fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./:/var/www/html:rw
+      - "~/.composer:/.composer:rw"
+    # Depends on ensures one service starts after another one.
+    # Depending on the aplications, startup order might be critical.
+    depends_on:
+      - database
+    networks:
+      - evento-network
+    extra_hosts:
+      - host.docker.internal:${CUSTOM_HOST_GATEWAY:-host-gateway}
+
+  database:
+    # Specify the image
+    image: docker.io/library/mysql:8.1.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: evento
+      MYSQL_USER: evento
+      MYSQL_PASSWORD: evento
+    volumes:
+      - evento-database:/var/lib/mysql:rw
+    networks:
+      - evento-network
+
+# Docker Volumes
+# Here the named volumes were specified.
+# For this application we need one named volume.
+#
+# There are two types of volume mounts:
+#  - Named Volumes: The evento-database volume is a named volume.
+#                   It is stored on a specific directory on the host and can be mounted to one
+#                   or multiple containers. These are commonly used to store data, like the data of
+#                   your database server.
+#  - Bind Mounts:   You can also bind mount host directories by just specifiyng a path instead
+#                   of the volume name (e. g. "data/mysql").
+#
+# You mount volumes using the "volumes" directive on a service.
+# You can mount either in mode rw (read/write) or ro (read-only).
+# Default mode is read-write.
+#
+# Format: [volume or path]:[path in container]:[rw/ro]
+#
+# Without Docker compose, the `docker network` command is used to manage networks. 
+volumes:
+  evento-caddy:
+  evento-database:
+
+# Docker Networks
+# In Docker networks containers can communicate.
+# Within the network, containers can only reach each other.
+#
+# You just need to add the network to the "networks" array of a service,
+# to put a service into the network.
+#
+# Without Docker compose the `docker volume` command is used to manage volumes.
+networks:
+  evento-network:

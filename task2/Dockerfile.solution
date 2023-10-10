@@ -1,4 +1,4 @@
-FROM --platform=amd64 caddy:2.5.2-alpine
+FROM --platform=amd64 caddy:2.7.4-alpine
 
 RUN mkdir -p /var/www/html
 

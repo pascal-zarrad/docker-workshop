@@ -1,12 +1,12 @@
-# Running containers
+# 1. Running containers
 Creating a container is done using `docker run [image]`.
 
-Run:
+**Run:**
 ```shell
 docker run hello-world
 ```
 
-Should output:
+**Output:**
 ```
 Hello from Docker!
 This message shows that your installation appears to be working correctly.

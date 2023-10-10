@@ -1,0 +1,55 @@
+# Version of the specifiction for this docker-compose file
+# Most of the time, almost anything above 3 will be fine.
+# In future versions, this line won't be necessary at all.
+version: '3.8'
+
+# Every service is a container that should be started.
+# You can imagine any of the services to be an own "docker run" command.
+# This also means that every option corresponds to some argument (e. g. "-v" for volume).
+#
+# Compose let's you configure many containers with ease and let's you keep track
+# of all the services.
+services:
+  # Setup a webserver using Caddy
+  webserver:
+    
+  # Setup PHP FPM (FactCGI Process Manager)
+  fpm:
+
+  # Setup a MySQL 8 database
+  # (We won't do anything with it today)
+  database:
+
+# Docker Volumes
+# Here the named volumes were specified.
+# For this application we need one named volume.
+#
+# There are two types of volume mounts:
+#  - Named Volumes: The evento-database volume is a named volume.
+#                   It is stored on a specific directory on the host and can be mounted to one
+#                   or multiple containers. These are commonly used to store data, like the data of
+#                   your database server.
+#  - Bind Mounts:   You can also bind mount host directories by just specifiyng a path instead
+#                   of the volume name (e. g. "data/mysql").
+#
+# You mount volumes using the "volumes" directive on a service.
+# You can mount either in mode rw (read/write) or ro (read-only).
+# Default mode is read-write.
+#
+# Format: [volume or path]:[path in container]:[rw/ro]
+#
+# Without Docker compose, the `docker network` command is used to manage networks. 
+volumes:
+  evento-caddy:
+  evento-database:
+
+# Docker Networks
+# In Docker networks containers can communicate.
+# Within the network, containers can only reach each other.
+#
+# You just need to add the network to the "networks" array of a service,
+# to put a service into the network.
+#
+# Without Docker compose the `docker volume` command is used to manage volumes.
+networks:
+  evento-network:
